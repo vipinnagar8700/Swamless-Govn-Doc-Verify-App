@@ -15,7 +15,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 const ProfileScreen = ({ navigation }: { navigation: any }) => {
     const { user, getMe, updateProfile, logout, uploadImage, deleteImage, loading } = useContext(AuthContext);
-    console.log("User:", user);
+
     const [isEdit, setIsEdit] = useState(false);
 
     const [profile, setProfile] = useState({
@@ -54,9 +54,7 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
             }));
 
             try {
-                console.log("Uploading image:", imageFile);
-                const data = await uploadImage(imageFile);
-                console.log("Upload response:", data);
+                await uploadImage(imageFile);
                 Alert.alert("Success", "Profile image updated successfully");
             } catch (e: any) {
                 // Revert to original image on error
@@ -233,14 +231,9 @@ const ProfileScreen = ({ navigation }: { navigation: any }) => {
             </View>
 
             {/* Documents */}
-            <View style={styles.card}>
-                <Text style={styles.sectionTitle}>Saved Documents</Text>
-                {renderDoc('Passport', 'Valid')}
-                {renderDoc('Aadhaar Card', 'Valid')}
-                {renderDoc('PAN Card', 'Valid')}
-                {renderDoc('Driving License', 'Expired')}
-            </View>
-
+            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("DocWalletScreen")}>
+                <Text style={styles.sectionTitle}>My Wallet Documents</Text>
+            </TouchableOpacity>
             {/* Reminders */}
             <View style={styles.card}>
                 <Text style={styles.sectionTitle}>Renewals & Reminders</Text>
@@ -337,18 +330,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 
-    loadingOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 50,
-    },
-
     name: {
         fontFamily: 'Poppins-Bold',
         fontSize: 16,
@@ -400,7 +381,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontFamily: 'Poppins-Bold',
         fontSize: 15,
-        marginBottom: 10,
     },
 
     row: {

@@ -12,6 +12,7 @@ import PrivacyPolicyScreen from '../screens/content-page/PrivacyPolicyScreen';
 import AiAssistScreen from '../screens/home/assistScreen';
 import { AuthContext } from '../context/AuthContext';
 import AppLoader from '../helper/AppLoader';
+import DocWalletScreen from '../screens/wallet/docWalletScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -34,6 +35,7 @@ export default function AppNavigator() {
                     <Stack.Screen name="AiAssistScreen" component={AiAssistScreen} />
                     <Stack.Screen name="TermConditionScreen" component={TermConditionScreen} />
                     <Stack.Screen name="PrivacyPolicyScreen" component={PrivacyPolicyScreen} />
+                    <Stack.Screen name="DocWalletScreen" component={DocWalletScreen} />
                 </>
             ) : (
                 <>

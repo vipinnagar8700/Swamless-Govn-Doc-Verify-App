@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const AuthContext = createContext();
 import { useEffect } from "react";
 import API from "../services/api";
+import { initializePushNotifications, unregisterPushNotifications } from '../services/pushNotifications';
 
 
 export const AuthProvider = ({ children }) => {
@@ -44,6 +45,22 @@ export const AuthProvider = ({ children }) => {
         loadToken();
     }, []);
 
+    useEffect(() => {
+        if (!token) {
+            return;
+        }
+
+        let cleanup;
+
+        (async () => {
+            cleanup = await initializePushNotifications();
+        })();
+
+        return () => {
+            cleanup?.();
+        };
+    }, [token]);
+
     // ✅ Verify OTP
     const verifyOtp = async (phone, otp) => {
         try {
@@ -69,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     // ✅ Get user profile
     const getMe = async () => {
         try {
-            const res = await getMeApi(); // no token needed
+            const res = await getMeApi(token);
             setUser(res.data?.user);
             return res.data;
         } catch (err) {
@@ -81,8 +98,8 @@ export const AuthProvider = ({ children }) => {
     const updateProfile = async (data) => {
         try {
             setLoading(true);
-            const res = await updateProfileApi(data); // no token needed
-            setUser(res.data?.user);
+            const res = await updateProfileApi(data, token);
+            setUser(res.data?.user); // update UI instantly
             return res.data;
         } catch (err) {
             throw err.response?.data || err;
@@ -94,22 +111,43 @@ export const AuthProvider = ({ children }) => {
     // ✅ Logout
     const logout = async () => {
         try {
-            await logoutApi(); // no token needed
+            await logoutApi(token);
         } catch (e) {
             console.log("Logout API fail (ignore)");
         } finally {
+            await unregisterPushNotifications();
             setUser(null);
             setToken(null);
             await AsyncStorage.removeItem("token");
         }
     };
 
-    // ✅ Upload Image — use the api function, not API directly
+    // ✅ Upload Image
     const uploadImage = async (file) => {
         try {
-            const res = await uploadImageApi(file); // no token needed
+            const formData = new FormData();
+
+            formData.append("image", {
+                uri: file.uri,
+                type: file.type || "image/jpeg",
+                name: file.fileName || "profile.jpg",
+            });
+
+            const res = await API.post(
+                "/user/upload-image",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+            console.log("Upload response:", res.data);
+            // ✅ IMPORTANT: update user state instantly
             setUser(res.data.user);
+
             return res.data;
+
         } catch (error) {
             throw error;
         }
@@ -118,13 +156,17 @@ export const AuthProvider = ({ children }) => {
     // ✅ Delete Image
     const deleteImage = async () => {
         try {
-            const res = await deleteImageApi(); // no token needed
+            const res = await API.delete("/delete-image");
+
+            // ✅ update user after delete
             setUser(res.data.user);
+
             return res.data;
         } catch (error) {
             throw error;
         }
     };
+
 
     return (
         <AuthContext.Provider

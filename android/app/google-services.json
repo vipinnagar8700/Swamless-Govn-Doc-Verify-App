@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1007418583561",
+    "project_id": "seamless-govn-app",
+    "storage_bucket": "seamless-govn-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007418583561:android:f2166eb0533579cb9e26d8",
+        "android_client_info": {
+          "package_name": "com.seamless"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDuhThXQ3U8gn-U9NlZlH5JQxZKl3yk4cA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,1 @@
+export type VerifyStatus = 'idle' | 'verifying' | 'valid' | 'invalid';
